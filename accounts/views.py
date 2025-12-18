@@ -1,24 +1,10 @@
-from django.contrib.auth import get_user_model
-from django.utils import timezone
+import logging
 from datetime import timedelta
+
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from django.urls import reverse
-import logging
-
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from django.utils import timezone
-import logging
-from .models import User, EmailVerification
-from .serializers import SignupSerializer
-from .utils import send_email_verification
-from .enums import RoleChoices
 
-logger = logging.getLogger(__name__)
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -36,9 +22,12 @@ from .serializers import (
     UserSerializer,
     EmailVerificationSerializer
 )
-from .utils import generate_otp, send_otp_email
+from .utils import generate_otp, send_otp_email, send_email_verification
+from .enums import RoleChoices
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
+
 
 
 # ---------------------------

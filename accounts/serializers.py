@@ -14,6 +14,12 @@ from django.core.validators import RegexValidator
 from .models import User # make sure RoleChoices exists
 from .models import EmailVerification, User
 
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from .models import OTP
+
+User = get_user_model()
+
 
 class SignupSerializer(serializers.Serializer):
     email = serializers.EmailField(
@@ -56,30 +62,6 @@ class SignupSerializer(serializers.Serializer):
         return attrs
 
 
-# class EmailVerificationSerializer(serializers.Serializer):
-#     token = serializers.UUIDField()
-
-#     def validate_token(self, value):
-#         try:
-#             verification = EmailVerification.objects.get(token=value)
-#         except EmailVerification.DoesNotExist:
-#             raise serializers.ValidationError("Invalid verification token.")
-
-#         if verification.is_expired():
-#             raise serializers.ValidationError("Token has expired.")
-#         return value
-
-#     def save(self):
-#         token = self.validated_data['token']
-#         verification = EmailVerification.objects.get(token=token)
-#         verification.is_verified = True
-#         verification.user.is_active = True  # activate the user
-#         verification.user.save()
-#         verification.save()
-#         return verification.user
-# accounts/serializers.py
-from rest_framework import serializers
-from accounts.models import EmailVerification
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
     token = serializers.UUIDField()
@@ -120,13 +102,6 @@ class LoginSerializer(serializers.Serializer):
         attrs["user"] = user
         return attrs
 
-from django.contrib.auth import get_user_model
-from rest_framework import serializers
-from .models import OTP
-from .utils import generate_otp, send_otp_email
-
-User = get_user_model()
-
 
 class SendOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -149,33 +124,6 @@ class SendOTPSerializer(serializers.Serializer):
         return user
 
 
-
-# class SendOTPSerializer(serializers.Serializer):
-#     email = serializers.EmailField()
-
-#     def validate_email(self, value):
-#         if not User.objects.filter(email=value).exists():
-#             raise serializers.ValidationError("User with this email does not exist.")
-#         return value
-
-#     def create(self, validated_data):
-#         # 1️⃣ Get the user
-#         user = User.objects.get(email=validated_data["email"])
-
-#         # 2️⃣ Generate OTP
-#         code = generate_otp()
-#         OTP.objects.create(user=user, code=code)
-
-#         # 3️⃣ Send OTP via email
-#         send_otp_email(user.email, code, name=user.name)
-
-#         # 4️⃣ Return the user object (not a dict) so the view can access user.email
-#         return user
-
-
-# ---------------------------
-# VERIFY OTP SERIALIZER
-# ---------------------------
 
 class VerifyOTPSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6)

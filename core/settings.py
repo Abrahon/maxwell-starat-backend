@@ -41,7 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'accounts',
+    "cloudinary",
+    "cloudinary_storage",
+    "accounts",
+    "profiles",
+    "classes",
+    "students",
+    "subjects",
+    "schedules",
+
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 MIDDLEWARE = [
@@ -116,6 +124,29 @@ EMAIL_USE_TLS = False
 EMAIL_HOST_USER = 'no-reply@gamerbytes.us'
 EMAIL_HOST_PASSWORD = 'Ayon28@gmail.com'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# cloudinary
+from decouple import config
+import cloudinary
+
+cloudinary.config(
+    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
+    api_key=config("CLOUDINARY_API_KEY"),
+    api_secret=config("CLOUDINARY_API_SECRET"),
+)
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": config("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": config("CLOUDINARY_API_KEY"),
+    "API_SECRET": config("CLOUDINARY_API_SECRET"),
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+
+
+
+
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
