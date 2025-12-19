@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "students",
     "subjects",
     "schedules",
+    "exams",
 
 ]
 CORS_ALLOW_ALL_ORIGINS = True
