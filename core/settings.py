@@ -126,6 +126,7 @@ EMAIL_HOST_USER = 'no-reply@gamerbytes.us'
 EMAIL_HOST_PASSWORD = 'Ayon28@gmail.com'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+
 # cloudinary
 from decouple import config
 import cloudinary
