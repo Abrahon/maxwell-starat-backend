@@ -1,0 +1,36 @@
+name: Django CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t django-app .
+
+      - name: Run container (test startup)
+        run: |
+          docker run -d --name test-app -p 8000:8000 django-app
+          sleep 10
+          docker logs test-app
+          docker stop test-app
+
+      - name: Run tests
+        run: |
+          pip install pytest
+          pytest
+
+      - name: Simulated Deploy
+        run: echo "Deploy successful 🚀"
