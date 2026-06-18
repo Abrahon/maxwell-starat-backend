@@ -1,4 +1,4 @@
-name: Django CI/CD Pipeline
+name: Django CI/CD Pipeline (Auto Deploy Simulation)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Set up Docker Buildx (recommended for modern builds)
+      # 2. Setup Docker
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -25,27 +25,40 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 4. Build Docker image (latest)
+      # 4. Build image
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/django-app:latest .
 
-      # 5. Tag image with commit SHA (versioned release)
-      - name: Tag Docker image
-        run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/django-app:latest \
-                     ${{ secrets.DOCKER_USERNAME }}/django-app:${{ github.sha }}
-
-      # 6. Push latest image
-      - name: Push latest image
+      # 5. Push image
+      - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/django-app:latest
 
-      # 7. Push versioned image
-      - name: Push versioned image
+      # 6. SIMULATED DEPLOY (THIS IS THE KEY PART)
+      - name: Pull image (simulate server pull)
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/django-app:${{ github.sha }}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/django-app:latest
 
-      # 8. Final confirmation step
-      - name: Simulated Deploy
-        run: echo "✅ Image successfully built and pushed to Docker Hub"
+      - name: Run container (simulate deployment)
+        run: |
+          docker run -d --name django-test -p 8000:8000 \
+            ${{ secrets.DOCKER_USERNAME }}/django-app:latest
+
+      # 7. Wait for startup
+      - name: Wait for app startup
+        run: sleep 10
+
+      # 8. Check running container
+      - name: Check container logs
+        run: docker logs django-test
+
+      # 9. Stop container (cleanup)
+      - name: Stop container
+        run: |
+          docker stop django-test
+          docker rm django-test
+
+      # 10. Final status
+      - name: Deployment Success
+        run: echo "🚀 Simulated deployment completed successfully"
